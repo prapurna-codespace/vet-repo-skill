@@ -51,6 +51,18 @@ curl -fsSL https://raw.githubusercontent.com/prapurna-codespace/vet-repo-skill/m
   -o ~/.claude/skills/vet-repo/SKILL.md
 ```
 
+### Windows (PowerShell)
+
+The commands above are for macOS and Linux. On Windows, run this in PowerShell:
+
+```powershell
+$dir = "$env:USERPROFILE\.claude\skills\vet-repo"
+New-Item -ItemType Directory -Force $dir | Out-Null
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/prapurna-codespace/vet-repo-skill/main/skills/vet-repo/SKILL.md" -OutFile "$dir\SKILL.md"
+```
+
+Or use WSL and follow Option 1 or 2 inside it. The Windows commands have not been tested by the author; please open an issue if they fail.
+
 ### Option 3: manual
 
 Create `~/.claude/skills/vet-repo/SKILL.md` and paste in the contents of [`skills/vet-repo/SKILL.md`](skills/vet-repo/SKILL.md).
@@ -120,7 +132,9 @@ Checked on 2026-10-21 against commit `e6c01d7`, by cloning the published repo in
 | Credentials | Nothing asks for API keys, SSH keys or cloud credentials |
 | Repo history and license | One commit by the author, MIT license. A new repo has no track record or stars to judge |
 
-**Not yet verified:** a full end-to-end install test of the `curl` command into a clean `HOME`. This audit was done by the author, so it is a sanity check and not an independent review. Please read the three files yourself before installing.
+**Install test (2026-10-21, macOS):** Option 1 (clone and copy) and Option 2 (`curl`) were each run into a fresh, empty `HOME`. Both exited 0, and the installed `SKILL.md` had an identical SHA-256 to the repo file (`c5fe0689…2e9eae`), with frontmatter intact.
+
+**Not yet verified:** loading and triggering the skill in a fresh Claude Code session, and the Windows PowerShell commands. This audit was done by the author, so it is a sanity check and not an independent review. Please read the three files yourself before installing.
 
 ## Contributing
 
