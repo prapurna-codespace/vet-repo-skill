@@ -90,6 +90,38 @@ Claude will clone the target into a fresh scratch directory, read and grep it, a
 - Clones into an isolated directory, separate from your working project.
 - Does not install anything without your explicit go-ahead.
 
+## Vetting a skill by hand
+
+You don't need this skill to check a skill. The same checks, done manually:
+
+1. **Read `SKILL.md` first, all of it.** It is plain-language instructions the agent will obey. Anything that tells the AI to hide things ("don't tell the user", "don't mention this"), or to touch files and settings the skill has no reason to touch, is a red flag.
+2. **Hunt for scripts.** Look for `.sh`, `.py`, `.js` and `install.sh` files and read each one. Never run `curl ... | bash` from a repo you haven't read.
+3. **Search for red-flag keywords** across the whole folder (`grep -rniE`):
+   - `curl`, `wget`: download and run things from the internet.
+   - `eval`, `base64`: hide what the code really does.
+   - `.ssh`, `.env`, `cookies`, `token`, `password`: go after credentials.
+   - Instructions to keep things from the user.
+
+   A match isn't automatically bad. It means you read that line carefully and check that it makes sense.
+4. **Check the repo itself.** Who is the author, and do they have a real history? Does the commit history look natural, or did everything land in one day? Is there a license? Stars can be bought, so they prove nothing.
+5. **Never hand over keys.** A skill should not need your API keys, SSH keys or cloud credentials. If it asks for them, stop.
+6. **Test in an empty folder, then have Claude audit it.** Run it somewhere with nothing sensitive in it, and ask Claude to read the whole repo and report anything suspicious before you trust it.
+
+## Audit of this repo
+
+Checked on 2026-10-21 against commit `e6c01d7`, by cloning the published repo into an empty directory.
+
+| Check | Result |
+|---|---|
+| Read all of `SKILL.md` | No instructions to hide anything from the user, and nothing that touches unrelated files or settings |
+| Scripts | None. The repo is three files: `LICENSE`, `README.md`, `skills/vet-repo/SKILL.md` |
+| Red-flag keywords | Every match is the skill or README *describing* what to look for. The only real `curl` is the install one-liner, which fetches this repo's own `SKILL.md` and pipes nothing to a shell |
+| Hidden characters | No non-ASCII characters, so no zero-width or unicode tricks |
+| Credentials | Nothing asks for API keys, SSH keys or cloud credentials |
+| Repo history and license | One commit by the author, MIT license. A new repo has no track record or stars to judge |
+
+**Not yet verified:** a full end-to-end install test of the `curl` command into a clean `HOME`. This audit was done by the author, so it is a sanity check and not an independent review. Please read the three files yourself before installing.
+
 ## Contributing
 
 Issues and PRs are welcome, especially new red-flag patterns, ecosystems (Go, Rust, Docker, GitHub Actions) and false-positive reports. Keep the skill a single readable `SKILL.md` where possible.
